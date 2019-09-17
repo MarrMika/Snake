@@ -1,6 +1,9 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+let bgGameSound = new Audio('sounds/gameSound2.mp3'),
+	endGameSound = new Audio('sounds/endGame.mp3');
+
 const ground = new Image();
 ground.src="img/body.png";
 
@@ -43,6 +46,8 @@ let dir;
 
 function endGame(){
 	ctx.font = "80px Arial";
+	bgGameSound.pause();
+	endGameSound.play(10);
 	ctx.fillText("~THE END~", box*2.5, box*8);
     clearInterval(game);
 
@@ -56,6 +61,14 @@ function  eatTail(head,arr){
    }
 }
 
+
+function playMusic(sound){
+	sound.play();
+}
+
+
+
+
 function direction(event){
 	if(event.keyCode == 37&&dir != "right"){
 		dir="left";
@@ -68,12 +81,22 @@ function direction(event){
 	}
 }
 
+function getRundomNumber(number,step){
+	return Math.floor(Math.random()*number+step);
+}
+
+
+
+//the main loop
 function drawGame(){
 	ctx.drawImage(ground, 0,0);
 
 	ctx.drawImage(foodItem[foodNumber],food.x,food.y);
+	 
+	playMusic(bgGameSound); 
 
 	for(let i = 0; i < snake.length; i++) {
+
 		ctx.fillStyle = i == 0 ? "red" : "green";
 		ctx.fillRect(snake[i].x, snake[i].y, box, box);
 	}
@@ -103,10 +126,11 @@ function drawGame(){
     }
 
 
-	if(dir == "left") snakeX -= box;
-	if(dir == "right") snakeX += box;
-	if(dir == "up") snakeY -= box;
-	if(dir == "down") snakeY += box;
+	if(dir == "left"&&snake.length==0) snakeX -= box
+		else if(dir == "left") snakeX -= box*0.5;
+	if(dir == "right") snakeX += box*0.5;
+	if(dir == "up") snakeY -= box*0.5;
+	if(dir == "down") snakeY += box*0.5;
 
 	let newHead = {
 		x:snakeX,
@@ -116,6 +140,7 @@ function drawGame(){
 	eatTail(newHead, snake);
 
 	snake.unshift(newHead);
+	
 }
 
 let game = setInterval(drawGame,100); //mls

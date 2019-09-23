@@ -2,47 +2,55 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 let bgGameSound = new Audio('sounds/gameSound2.mp3'),
-	endGameSound = new Audio('sounds/endGame.mp3');
+	endGameSound = new Audio('sounds/endGame.mp3'),
+	touchGameSound = new Audio('sounds/touch.mp3');
 
 const ground = new Image();
 ground.src="img/body.png";
 
-let foodItem = new Array();
-foodItem[0]= new Image();
-foodItem[0].src="img/apple.png";
-foodItem[1]= new Image();
-foodItem[1].src="img/avocado.png";
-foodItem[2]= new Image();
-foodItem[2].src="img/banana.png";
-foodItem[3]= new Image();
-foodItem[3].src="img/carrot.png";
-foodItem[4]= new Image();
-foodItem[4].src="img/grape.png";
-foodItem[5]= new Image();
-foodItem[5].src="img/pineapple.png";
-let foodNumber = Math.floor((Math.random() * 5));
-
-
-let box = 32;
-
-
+let box = 32, count = 0;
 let score = 0;
-
 let food = {
-	x:Math.floor((Math.random()*17+1))*box,
-	y:Math.floor((Math.random()*15+3))*box
+	x:getRundomNumber(17,1)*box,
+	y:getRundomNumber(15,3)*box
 };
-
 let snake = [];
 snake[0] = {
 	x:9*box,
 	y:10*box
 };
 
+let dir;
+
+
+let bodySnake = [];
+bodySnake[0] = new Image();
+bodySnake[0].src = "img/headUp.png";
+
+
+let foodItem = new Array();
+foodItem[0] = new Image();
+foodItem[0].src="img/apple.png";
+foodItem[1] = new Image();
+foodItem[1].src="img/avocado.png";
+foodItem[2] = new Image();
+foodItem[2].src="img/banana.png";
+foodItem[3] = new Image();
+foodItem[3].src="img/carrot.png";
+foodItem[4] = new Image();
+foodItem[4].src="img/grape.png";
+foodItem[5] = new Image();
+foodItem[5].src="img/pineapple.png";
+let foodNumber = getRundomNumber(5,0);
+//bodySnake[0]=foodItem[foodNumber];
+
 
 document.addEventListener("keydown", direction);
 
-let dir;
+function getRundomFood(){
+	foodNumber = getRundomNumber(5,0);
+	bodySnake.push(foodItem[foodNumber]);
+}
 
 function endGame(){
 	ctx.font = "80px Arial";
@@ -90,16 +98,20 @@ function getRundomNumber(number,step){
 //the main loop
 function drawGame(){
 	ctx.drawImage(ground, 0,0);
-
-	ctx.drawImage(foodItem[foodNumber],food.x,food.y);
-	 
 	playMusic(bgGameSound); 
+	ctx.drawImage(foodItem[foodNumber],food.x,food.y);
 
-	for(let i = 0; i < snake.length; i++) {
 
+
+	for(let i = 0; i < snake.length; i++) {		
 		ctx.fillStyle = i == 0 ? "red" : "green";
-		ctx.fillRect(snake[i].x, snake[i].y, box, box);
+		if(i!=0){
+		 ctx.drawImage(bodySnake[i],snake[i].x, snake[i].y);
+		}
+		else ctx.drawImage(bodySnake[0],snake[i].x, snake[i].y);  //fillRect(snake[i].x, snake[i].y, box, box);
 	}
+
+	
 
 	ctx.fillStyle = "white";
 	ctx.font = "50px Arial";
@@ -112,7 +124,14 @@ function drawGame(){
 
 	if(snakeX == food.x && snakeY == food.y) {
 		score++;
-		foodNumber = Math.floor((Math.random() * 5));
+
+			//music
+		bgGameSound.pause();
+		touchGameSound.currentTime = 0;
+		touchGameSound.play();
+		touchGameSound.pause();
+
+		getRundomFood();
 		food = {
 			x: Math.floor((Math.random() * 17 + 1)) * box,
 			y: Math.floor((Math.random() * 15 + 3)) * box,
@@ -125,12 +144,22 @@ function drawGame(){
     	endGame();
     }
 
-
-	if(dir == "left"&&snake.length==0) snakeX -= box
-		else if(dir == "left") snakeX -= box*0.5;
-	if(dir == "right") snakeX += box*0.5;
-	if(dir == "up") snakeY -= box*0.5;
-	if(dir == "down") snakeY += box*0.5;
+	if(dir == "left"){
+		snakeX -= box;
+		bodySnake[0].src = "img/headLeft.png";
+	}
+	if(dir == "right") {
+		snakeX += box*0.5;
+		bodySnake[0].src = "img/headRight.png";
+	}
+	if(dir == "up"){
+	 	snakeY -= box*0.5;
+		bodySnake[0].src = "img/headUp.png";
+	}
+	if(dir == "down") {
+		snakeY += box*0.5;
+		bodySnake[0].src = "img/headDown.png";
+	}
 
 	let newHead = {
 		x:snakeX,
@@ -140,6 +169,8 @@ function drawGame(){
 	eatTail(newHead, snake);
 
 	snake.unshift(newHead);
+
+
 	
 }
 

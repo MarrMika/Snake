@@ -149,15 +149,15 @@ function drawGame(){
 		bodySnake[0].src = "img/headLeft.png";
 	}
 	if(dir == "right") {
-		snakeX += box*0.5;
+		snakeX += box;
 		bodySnake[0].src = "img/headRight.png";
 	}
 	if(dir == "up"){
-	 	snakeY -= box*0.5;
+	 	snakeY -= box;
 		bodySnake[0].src = "img/headUp.png";
 	}
 	if(dir == "down") {
-		snakeY += box*0.5;
+		snakeY += box;
 		bodySnake[0].src = "img/headDown.png";
 	}
 
